@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Robot Arm Control Panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f8f8f8; }
+        .container { background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        input[type='range'] { width: 100px; }
+        button { margin: 3px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Robot Arm Control Panel</h2>
+        <form id="poseForm">
+            <div>
+                <label>Motor 1: <input type="range" name="motor1" min="0" max="180" value="90" oninput="updateValue(this, 'val1')"> <span id="val1">90</span></label><br>
+                <label>Motor 2: <input type="range" name="motor2" min="0" max="180" value="90" oninput="updateValue(this, 'val2')"> <span id="val2">90</span></label><br>
+                <label>Motor 3: <input type="range" name="motor3" min="0" max="180" value="90" oninput="updateValue(this, 'val3')"> <span id="val3">90</span></label><br>
+                <label>Motor 4: <input type="range" name="motor4" min="0" max="180" value="90" oninput="updateValue(this, 'val4')"> <span id="val4">90</span></label><br>
+                <label>Motor 5: <input type="range" name="motor5" min="0" max="180" value="90" oninput="updateValue(this, 'val5')"> <span id="val5">90</span></label><br>
+                <label>Motor 6: <input type="range" name="motor6" min="0" max="180" value="90" oninput="updateValue(this, 'val6')"> <span id="val6">90</span></label><br><br>
+            </div>
+            <button type="button" onclick="resetSliders()">Reset</button>
+            <button type="button" onclick="savePose()">Save Pose</button>
+            <button type="button" onclick="loadTable()">Run</button>
+        </form>
+
+        <!-- جدول البيانات -->
+        <div id="poseTable" style="margin-top: 30px; background: white; padding: 10px; border-radius: 10px;">
+            <!-- يتم تعبئة الجدول هنا بواسطة جافاسكربت -->
+        </div>
+    </div>
+
+    <script>
+        function updateValue(slider, outputId) {
+            document.getElementById(outputId).innerText = slider.value;
+        }
+
+        function resetSliders() {
+            for (let i = 1; i <= 6; i++) {
+                let slider = document.querySelector(`[name='motor${i}']`);
+                slider.value = 90;
+                document.getElementById("val" + i).innerText = "90";
+            }
+        }
+
+        function savePose() {
+            const formData = new FormData(document.getElementById("poseForm"));
+            fetch("save_pose.php", {
+                method: "POST",
+                body: new URLSearchParams(formData)
+            }).then(() => loadTable());
+        }
+
+        function loadTable() {
+            fetch("get_run_pose.php")
+                .then(res => res.text())
+                .then(html => document.getElementById("poseTable").innerHTML = html);
+        }
+
+        window.onload = loadTable;
+    </script>
+</body>
+</html>
